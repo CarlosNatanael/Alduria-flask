@@ -1,7 +1,6 @@
-# app.py
-
 from flask import Flask, jsonify, render_template, request
-# 1. Importe o 'db' e seu modelo 'Player'
+from game_logic.engine import BattleEngine
+from game_logic.models import Monster
 from game_logic.models import db, Player, CharacterClass
 
 app = Flask(__name__)
@@ -148,6 +147,68 @@ def seed_classes():
     db.session.add_all([guerreiro, arqueiro, mago, paladino])
     db.session.commit()
     print("Classes criadas com sucesso!")
+
+active_battles = {}
+
+def seed_monsters():
+    if db.session.get(Monster, 1): return
+    print("Semeando monstros...")
+    goblin = Monster(
+        name="Goblin Fraco",
+        description="Uma criatura pequena e irritante.",
+        hp=30, attack_power=5, xp_reward=10,
+        ascii_art="""
+          (o)
+         /|\\
+         / \\
+        """
+    )
+    db.session.add(goblin)
+    db.session.commit()
+
+# Chame seed_monsters() na inicialização do seu app
+# if __name__ == '__main__':
+#    ...
+#    seed_monsters()
+#    ...
+
+@app.route('/api/battle/start', methods=['POST'])
+def start_battle():
+    player_id = request.json.get('player_id')
+    player = db.session.get(Player, player_id)
+    
+    # Por enquanto, sempre luta contra o monstro 1
+    monster = db.session.get(Monster, 1)
+    
+    if not player or not monster:
+        return jsonify({"error": "Jogador ou monstro não encontrado"}), 404
+        
+    # Cria uma nova instância de batalha
+    battle = BattleEngine(player, monster)
+    active_battles[player.id] = battle
+    
+    return jsonify(battle.get_state())
+
+@app.route('/api/battle/action', methods=['POST'])
+def battle_action():
+    player_id = request.json.get('player_id')
+    action = request.json.get('action') # 'attack' ou 'special_skill'
+    
+    battle = active_battles.get(player_id)
+    if not battle:
+        return jsonify({"error": "Nenhuma batalha ativa para este jogador"}), 404
+
+    if action == 'attack':
+        battle.player_attack()
+    elif action == 'special_skill':
+        battle.player_special_skill()
+    
+    # Após a ação, salva o estado do jogador (HP, MP, XP) no banco
+    if battle.is_over:
+        db.session.commit() # Salva as mudanças permanentemente
+        del active_battles[player_id] # Limpa a batalha da memória
+    
+    return jsonify(battle.get_state())
 
 # No final do app.py
 if __name__ == '__main__':

@@ -3,31 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Lenda de Aldurian - Criação de Personagem</title>
+    <title>A Lenda de Aldurian</title>
     
-    <!-- Scripts e Fontes Externas -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Roboto:wght@400;700&family=Source+Code+Pro&display=swap" rel="stylesheet">
     
-    <!-- Link para seu arquivo CSS externo -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body class="bg-gray-900 text-white flex items-center justify-center min-h-screen p-4">
 
     <div id="app" class="w-full max-w-4xl mx-auto">
 
-        <!-- Seção de Criação de Personagem -->
+        <!-- Seção de Criação de Personagem (será oculta após o início) -->
         <div id="character-creation-section">
+            <!-- Conteúdo da criação de personagem que já fizemos -->
             <h1 class="text-5xl md:text-6xl text-center medieval-font text-yellow-400 mb-2">A Lenda de Aldurian</h1>
             <p class="text-center text-gray-400 mb-8">Escolha sua classe e forje seu destino.</p>
-
             <div id="class-selection-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <!-- Cards das classes serão inseridos aqui pelo JavaScript -->
                 <div id="loading-classes" class="text-center col-span-full">Carregando classes...</div>
             </div>
-
             <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
                 <div class="mb-4">
                     <label for="player-name" class="block text-yellow-400 medieval-font text-xl mb-2">Nome do Herói</label>
@@ -40,16 +36,49 @@
             </div>
         </div>
 
-        <!-- Seção Pós-Criação (inicialmente oculta) -->
-        <div id="game-world-section" class="hidden text-center">
-             <h2 class="text-4xl medieval-font text-yellow-400 mb-4">Bem-vindo, <span id="welcome-player-name"></span>!</h2>
-             <p class="text-xl text-gray-300">Sua aventura em Aldurian está prestes a começar.</p>
-             <p class="mt-8">A próxima etapa será o sistema de batalha. Prepare-se!</p>
-        </div>
+        <!-- NOVA SEÇÃO: Tela de Batalha (inicialmente oculta) -->
+        <div id="battle-section" class="hidden">
+            <!-- Área do Monstro e Jogador -->
+            <div class="flex flex-col md:flex-row justify-around items-center gap-8 mb-4">
+                <!-- Painel do Jogador -->
+                <div class="character-panel w-full md:w-2/5">
+                    <h2 id="player-battle-name" class="text-3xl medieval-font text-blue-400">Jogador</h2>
+                    <!-- Barra de HP -->
+                    <div class="bar-container bg-gray-700"><div id="player-hp-bar" class="hp-bar bg-green-500"></div></div>
+                    <p id="player-hp-text" class="bar-text">HP: 100 / 100</p>
+                    <!-- Barra de MP -->
+                    <div class="bar-container bg-gray-700"><div id="player-mp-bar" class="mp-bar bg-blue-500"></div></div>
+                    <p id="player-mp-text" class="bar-text">MP: 50 / 50</p>
+                </div>
+                <!-- Painel do Monstro -->
+                <div class="character-panel w-full md:w-2/5 text-center">
+                    <h2 id="monster-battle-name" class="text-3xl medieval-font text-red-500">Monstro</h2>
+                    <!-- Arte ASCII do Monstro -->
+                    <pre id="monster-ascii-art" class="ascii-art text-yellow-300 leading-tight"></pre>
+                    <!-- Barra de HP do Monstro -->
+                    <div class="bar-container bg-gray-700"><div id="monster-hp-bar" class="hp-bar bg-red-600"></div></div>
+                    <p id="monster-hp-text" class="bar-text">HP: 30 / 30</p>
+                </div>
+            </div>
+            
+            <!-- Log de Batalha -->
+            <div id="battle-log" class="battle-log bg-gray-800 border-2 border-yellow-600/50 p-4 rounded-lg h-32 overflow-y-auto mb-4">
+            </div>
 
+            <!-- Controles de Batalha -->
+            <div id="battle-controls" class="grid grid-cols-2 gap-4">
+                <button id="attack-btn" class="battle-btn bg-red-600 hover:bg-red-700">Atacar</button>
+                <button id="skill-btn" class="battle-btn bg-blue-600 hover:bg-blue-700">Habilidade</button>
+            </div>
+            
+            <!-- Tela de Fim de Batalha (inicialmente oculta) -->
+            <div id="battle-over-section" class="hidden text-center mt-6">
+                <h3 id="battle-result-text" class="text-4xl medieval-font"></h3>
+                <button id="continue-btn" class="mt-4 bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2 px-8 rounded-lg medieval-font text-xl">Continuar</button>
+            </div>
+        </div>
     </div>
 
-    <!-- Link para seu arquivo JavaScript externo -->
     <script src="{{ url_for('static', filename='js/game.js') }}"></script>
 </body>
 </html>

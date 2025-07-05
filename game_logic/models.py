@@ -46,5 +46,24 @@ class Player(db.Model):
     
     def __repr__(self):
         return f'<Player {self.name} - {self.character_class.name}>'
+    
+class Monster(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True, nullable=False)
+    description = db.Column(db.Text)
+    
+    # Atributos de combate do monstro
+    hp = db.Column(db.Integer, nullable=False)
+    mp = db.Column(db.Integer, default=0)
+    attack_power = db.Column(db.Integer, nullable=False)
+    
+    # Recompensa por derrotá-lo
+    xp_reward = db.Column(db.Integer, nullable=False)
+    
+    # Para a sua ideia de ASCII art!
+    ascii_art = db.Column(db.Text)
+
+    def __repr__(self):
+        return f'<Monster {self.name}>'
 
 # Vamos remover as classes Quest e Choice por enquanto para focar na mecânica.

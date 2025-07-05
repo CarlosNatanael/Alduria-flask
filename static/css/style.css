@@ -1,31 +1,96 @@
-/* Importação de fontes e estilos base */
+/* Estilos da tela de criação (mantidos) */
 body {
     font-family: 'Roboto', sans-serif;
 }
-
 .medieval-font {
     font-family: 'MedievalSharp', cursive;
 }
-
-/* Estilos para os cards de seleção de classe */
 .class-card {
     transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
-
 .class-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 15px -3px rgba(255, 215, 0, 0.3), 0 4px 6px -2px rgba(255, 215, 0, 0.2);
 }
-
 .class-card.selected {
     transform: translateY(-5px);
-    box-shadow: 0 0 0 3px #FBBF24; /* Amarelo/Dourado */
-    background-color: #4A5568; /* Cinza escuro */
+    box-shadow: 0 0 0 3px #FBBF24;
+    background-color: #4A5568;
 }
-
-/* Estilo para os ícones SVG das classes */
 .icon-style {
     width: 48px;
     height: 48px;
     stroke-width: 1.5;
+}
+
+/* --- NOVOS ESTILOS PARA A TELA DE BATALHA --- */
+
+.character-panel {
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid #4A5568;
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+.bar-container {
+    width: 100%;
+    height: 20px;
+    border-radius: 10px;
+    margin-top: 8px;
+    border: 1px solid #6b7280;
+}
+
+.hp-bar, .mp-bar {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s ease-in-out;
+}
+
+.bar-text {
+    font-size: 0.8rem;
+    text-align: center;
+    margin-top: 2px;
+    color: #D1D5DB;
+}
+
+.ascii-art {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 1rem;
+    margin: 1rem 0;
+    white-space: pre;
+    text-shadow: 0 0 5px rgba(252, 211, 77, 0.5);
+}
+
+.battle-log {
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.9rem;
+}
+
+.battle-log p {
+    margin-bottom: 4px;
+}
+
+.battle-btn {
+    font-family: 'MedievalSharp', cursive;
+    font-size: 1.5rem;
+    color: white;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s;
+    border-bottom: 4px solid rgba(0,0,0,0.4);
+}
+
+.battle-btn:hover {
+    transform: translateY(-2px);
+}
+
+.battle-btn:active {
+    transform: translateY(0);
+    border-bottom-width: 2px;
+}
+
+.battle-btn:disabled {
+    background-color: #4A5568;
+    cursor: not-allowed;
+    border-bottom: 4px solid #374151;
 }

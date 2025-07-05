@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Lenda de Aldurian - Criação de Personagem</title>
+    
+    <!-- Scripts e Fontes Externas -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Link para seu arquivo CSS externo -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen p-4">
+
+    <div id="app" class="w-full max-w-4xl mx-auto">
+
+        <!-- Seção de Criação de Personagem -->
+        <div id="character-creation-section">
+            <h1 class="text-5xl md:text-6xl text-center medieval-font text-yellow-400 mb-2">A Lenda de Aldurian</h1>
+            <p class="text-center text-gray-400 mb-8">Escolha sua classe e forje seu destino.</p>
+
+            <div id="class-selection-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Cards das classes serão inseridos aqui pelo JavaScript -->
+                <div id="loading-classes" class="text-center col-span-full">Carregando classes...</div>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                <div class="mb-4">
+                    <label for="player-name" class="block text-yellow-400 medieval-font text-xl mb-2">Nome do Herói</label>
+                    <input type="text" id="player-name" class="w-full bg-gray-700 border border-gray-600 rounded-md p-3 text-white focus:ring-2 focus:ring-yellow-500 focus:outline-none" placeholder="Digite o nome do seu personagem">
+                </div>
+                <button id="create-character-btn" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 px-6 rounded-lg medieval-font text-2xl transition duration-300 disabled:bg-gray-600 disabled:cursor-not-allowed">
+                    Iniciar Jornada
+                </button>
+                <p id="error-message" class="text-red-400 text-center mt-4"></p>
+            </div>
+        </div>
+
+        <!-- Seção Pós-Criação (inicialmente oculta) -->
+        <div id="game-world-section" class="hidden text-center">
+             <h2 class="text-4xl medieval-font text-yellow-400 mb-4">Bem-vindo, <span id="welcome-player-name"></span>!</h2>
+             <p class="text-xl text-gray-300">Sua aventura em Aldurian está prestes a começar.</p>
+             <p class="mt-8">A próxima etapa será o sistema de batalha. Prepare-se!</p>
+        </div>
+
+    </div>
+
+    <!-- Link para seu arquivo JavaScript externo -->
+    <script src="{{ url_for('static', filename='js/game.js') }}"></script>
+</body>
+</html>

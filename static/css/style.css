@@ -1,0 +1,31 @@
+/* Importação de fontes e estilos base */
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+.medieval-font {
+    font-family: 'MedievalSharp', cursive;
+}
+
+/* Estilos para os cards de seleção de classe */
+.class-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.class-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(255, 215, 0, 0.3), 0 4px 6px -2px rgba(255, 215, 0, 0.2);
+}
+
+.class-card.selected {
+    transform: translateY(-5px);
+    box-shadow: 0 0 0 3px #FBBF24; /* Amarelo/Dourado */
+    background-color: #4A5568; /* Cinza escuro */
+}
+
+/* Estilo para os ícones SVG das classes */
+.icon-style {
+    width: 48px;
+    height: 48px;
+    stroke-width: 1.5;
+}

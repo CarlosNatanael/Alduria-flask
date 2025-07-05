@@ -1,0 +1,19 @@
+/Aldurian-flask/
+|
+|-- app.py               # Arquivo principal do Flask
+|-- /game_logic/         # Módulo para a lógica do jogo (separado da web)
+|   |-- __init__.py
+|   |-- models.py        # Classes de Personagem, Monstro, Itens, etc.
+|   |-- engine.py        # Funções de combate, cálculo de dano, etc.
+|
+|-- /templates/          # Arquivos HTML
+|   |-- index.html       # A tela principal do jogo
+|
+|-- /static/             # Arquivos estáticos (CSS, JS, imagens)
+|   |-- /css/
+|   |   |-- style.css
+|   |-- /js/
+|   |   |-- game.js      # Lógica do frontend
+|   |-- /images/
+|       |-- player.png
+|       |-- monster.png

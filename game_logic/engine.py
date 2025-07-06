@@ -1,4 +1,3 @@
-# game_logic/engine.py
 import random
 
 class BattleEngine:
@@ -77,11 +76,17 @@ class BattleEngine:
                 "mp": self.player.mp,
                 "max_mp": self.player.max_mp,
                 "level": self.player.level,
-                "xp": self.player.xp
+                "xp": self.player.xp,
+                "skill": {
+                    "name": self.player.character_class.special_skill_name,
+                    "description": self.player.character_class.special_skill_description,
+                    "cost": self.player.character_class.special_skill_cost
+                }
             },
             "monster": {
                 "name": self.monster.name,
                 "hp": self.monster.hp,
+                "max_hp": self.monster.max_hp, 
                 "ascii_art": self.monster.ascii_art
             },
             "turn": self.turn,

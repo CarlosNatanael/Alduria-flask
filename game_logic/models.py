@@ -1,9 +1,7 @@
-# game_logic/models.py
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-# NOVA TABELA: Para guardar as informações de cada classe jogável
 class CharacterClass(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
@@ -42,8 +40,6 @@ class Player(db.Model):
     # Atributo de Moralidade/Alinhamento (vamos usar depois)
     alignment = db.Column(db.Integer, default=0)
     
-    # Vamos reintroduzir o current_quest_id quando conectarmos a história
-    
     def __repr__(self):
         return f'<Player {self.name} - {self.character_class.name}>'
     
@@ -54,6 +50,7 @@ class Monster(db.Model):
     
     # Atributos de combate do monstro
     hp = db.Column(db.Integer, nullable=False)
+    max_hp = db.Column(db.Integer, nullable=False)
     mp = db.Column(db.Integer, default=0)
     attack_power = db.Column(db.Integer, nullable=False)
     
@@ -65,5 +62,3 @@ class Monster(db.Model):
 
     def __repr__(self):
         return f'<Monster {self.name}>'
-
-# Vamos remover as classes Quest e Choice por enquanto para focar na mecânica.

@@ -1,96 +1,78 @@
-/* Estilos da tela de criação (mantidos) */
-body {
-    font-family: 'Roboto', sans-serif;
+/* Estilos antigos mantidos */
+body { font-family: 'Roboto', sans-serif; }
+.medieval-font { font-family: 'MedievalSharp', cursive; }
+.class-card { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+.class-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(255, 215, 0, 0.3), 0 4px 6px -2px rgba(255, 215, 0, 0.2); }
+.class-card.selected { transform: translateY(-5px); box-shadow: 0 0 0 3px #FBBF24; background-color: #4A5568; }
+.icon-style { width: 48px; height: 48px; stroke-width: 1.5; }
+.character-panel { background-color: rgba(0, 0, 0, 0.2); border: 1px solid #4A5568; padding: 1rem; border-radius: 0.5rem; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.bar-container { width: 100%; height: 20px; border-radius: 10px; margin-top: 8px; border: 1px solid #6b7280; }
+.hp-bar, .mp-bar { height: 100%; border-radius: 10px; transition: width 0.5s ease-in-out; }
+.bar-text { font-size: 0.8rem; text-align: center; margin-top: 2px; color: #D1D5DB; }
+.ascii-art { font-family: 'Source Code Pro', monospace; font-size: 1rem; margin: 1rem 0; white-space: pre; text-shadow: 0 0 5px rgba(252, 211, 77, 0.5); }
+.battle-log { font-family: 'Roboto', sans-serif; font-size: 0.9rem; scroll-behavior: smooth; }
+.battle-log p { margin-bottom: 4px; }
+.battle-btn { font-family: 'MedievalSharp', cursive; font-size: 1.5rem; color: white; padding: 0.75rem; border-radius: 0.5rem; transition: background-color 0.2s; border-bottom: 4px solid rgba(0,0,0,0.4); }
+.battle-btn:hover { transform: translateY(-2px); }
+.battle-btn:active { transform: translateY(0); border-bottom-width: 2px; }
+.battle-btn:disabled { background-color: #4A5568; cursor: not-allowed; border-bottom: 4px solid #374151; transform: translateY(0); }
+
+/* --- NOVOS ESTILOS DE ANIMAÇÃO E FEEDBACK --- */
+
+/* Animação de Screen Shake */
+.screen-shake {
+    animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
 }
-.medieval-font {
-    font-family: 'MedievalSharp', cursive;
-}
-.class-card {
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-.class-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 15px -3px rgba(255, 215, 0, 0.3), 0 4px 6px -2px rgba(255, 215, 0, 0.2);
-}
-.class-card.selected {
-    transform: translateY(-5px);
-    box-shadow: 0 0 0 3px #FBBF24;
-    background-color: #4A5568;
-}
-.icon-style {
-    width: 48px;
-    height: 48px;
-    stroke-width: 1.5;
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
 }
 
-/* --- NOVOS ESTILOS PARA A TELA DE BATALHA --- */
-
-.character-panel {
-    background-color: rgba(0, 0, 0, 0.2);
-    border: 1px solid #4A5568;
-    padding: 1rem;
-    border-radius: 0.5rem;
+/* Flash de dano no painel do personagem */
+.damage-flash {
+    box-shadow: 0 0 25px rgba(255, 0, 0, 0.7);
+    transform: scale(1.02);
 }
 
-.bar-container {
+/* Estilo para os números de dano flutuantes */
+.damage-popup-container {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 20px;
-    border-radius: 10px;
-    margin-top: 8px;
-    border: 1px solid #6b7280;
-}
-
-.hp-bar, .mp-bar {
     height: 100%;
-    border-radius: 10px;
-    transition: width 0.5s ease-in-out;
+    pointer-events: none; /* Permite clicar através dele */
+}
+.damage-popup {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%);
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #fefcbf; /* Amarelo claro */
+    text-shadow: -2px 0 red, 0 2px red, 2px 0 red, 0 -2px red;
+    animation: float-up 1.5s ease-out forwards;
+    z-index: 10;
+}
+@keyframes float-up {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -100px);
+    }
 }
 
-.bar-text {
-    font-size: 0.8rem;
-    text-align: center;
-    margin-top: 2px;
-    color: #D1D5DB;
-}
-
-.ascii-art {
-    font-family: 'Source Code Pro', monospace;
-    font-size: 1rem;
-    margin: 1rem 0;
-    white-space: pre;
-    text-shadow: 0 0 5px rgba(252, 211, 77, 0.5);
-}
-
-.battle-log {
-    font-family: 'Roboto', sans-serif;
-    font-size: 0.9rem;
-}
-
-.battle-log p {
-    margin-bottom: 4px;
-}
-
-.battle-btn {
-    font-family: 'MedievalSharp', cursive;
-    font-size: 1.5rem;
-    color: white;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    transition: background-color 0.2s;
-    border-bottom: 4px solid rgba(0,0,0,0.4);
-}
-
-.battle-btn:hover {
-    transform: translateY(-2px);
-}
-
-.battle-btn:active {
-    transform: translateY(0);
-    border-bottom-width: 2px;
-}
-
-.battle-btn:disabled {
-    background-color: #4A5568;
-    cursor: not-allowed;
-    border-bottom: 4px solid #374151;
+/* Estilo para o tooltip da habilidade */
+#skill-tooltip {
+    pointer-events: none;
+    z-index: 20;
+    bottom: 110%; /* Posiciona acima do botão */
+    right: 0;
+    width: 250px;
 }

@@ -1,16 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     // --- Seletores de Elementos ---
-    // Tela de Criação
+    const appContainer = document.getElementById('app');
     const creationSection = document.getElementById('character-creation-section');
     const classContainer = document.getElementById('class-selection-container');
     const loadingText = document.getElementById('loading-classes');
     const nameInput = document.getElementById('player-name');
     const createButton = document.getElementById('create-character-btn');
     const errorMessage = document.getElementById('error-message');
-
-    // Tela de Batalha
     const battleSection = document.getElementById('battle-section');
+    const playerPanel = document.getElementById('player-panel');
+    const monsterPanel = document.getElementById('monster-panel');
     const playerBattleName = document.getElementById('player-battle-name');
     const playerHpBar = document.getElementById('player-hp-bar');
     const playerHpText = document.getElementById('player-hp-text');
@@ -20,19 +20,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const monsterAsciiArt = document.getElementById('monster-ascii-art');
     const monsterHpBar = document.getElementById('monster-hp-bar');
     const monsterHpText = document.getElementById('monster-hp-text');
+    const turnIndicator = document.getElementById('turn-indicator');
     const battleLog = document.getElementById('battle-log');
     const battleControls = document.getElementById('battle-controls');
     const attackBtn = document.getElementById('attack-btn');
     const skillBtn = document.getElementById('skill-btn');
+    const skillTooltip = document.getElementById('skill-tooltip');
     const battleOverSection = document.getElementById('battle-over-section');
     const battleResultText = document.getElementById('battle-result-text');
     const continueBtn = document.getElementById('continue-btn');
 
     // --- Estado do Jogo ---
     let selectedClassId = null;
-    let playerId = localStorage.getItem('player_id'); // Tenta carregar o jogador existente
+    let playerId = null; // Começa como nulo, será definido após a criação
+    let lastLogLength = 0;
+    let skillInfo = {};
+    let currentMonsterMaxHp = 1;
 
-    // --- Ícones para as classes (mesmo de antes) ---
+    // --- Ícones ---
     const icons = {
         "Guerreiro": `<svg class="icon-style" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v11m-8-6h16" /></svg>`,
         "Arqueiro": `<svg class="icon-style" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 9.75L16.5 12l-2.25 2.25m-4.5 0L7.5 12l2.25-2.25M6 20.25h12A2.25 2.25 0 0020.25 18V5.75A2.25 2.25 0 0018 3.5H6A2.25 2.25 0 003.75 5.75v12.5A2.25 2.25 0 006 20.25z" /></svg>`,
@@ -41,13 +46,12 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- LÓGICA DE CRIAÇÃO DE PERSONAGEM ---
-    // (As funções fetchAndRenderClasses e selectClass são as mesmas de antes)
     async function fetchAndRenderClasses() {
         try {
             const response = await fetch('/api/classes');
             if (!response.ok) throw new Error('Falha ao buscar classes.');
             const classes = await response.json();
-            if (loadingText) loadingText.remove(); 
+            if (loadingText) loadingText.remove();
             classContainer.innerHTML = '';
             classes.forEach(c => {
                 const card = document.createElement('div');
@@ -66,7 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
         cardElement.classList.add('selected');
         selectedClassId = classId;
     }
-
     async function handleCreateCharacter() {
         const playerName = nameInput.value.trim();
         errorMessage.textContent = '';
@@ -86,13 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok || result.error) throw new Error(result.error || 'Ocorreu um erro.');
             
             playerId = result.player_id;
-            localStorage.setItem('player_id', playerId);
-            
-            // TRANSIÇÃO PARA A BATALHA
-            creationSection.classList.add('hidden');
-            battleSection.classList.remove('hidden');
-            startBattle();
-
+            transitionToBattle();
         } catch (error) {
             errorMessage.textContent = error.message;
             createButton.disabled = false;
@@ -100,47 +97,72 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- LÓGICA DE BATALHA ---
-    
-    // Atualiza toda a UI da batalha com base no estado recebido da API
-    function updateBattleUI(state) {
-        // Jogador
-        playerBattleName.textContent = state.player.name;
-        playerHpText.textContent = `HP: ${state.player.hp} / ${state.player.max_hp}`;
-        playerHpBar.style.width = `${(state.player.hp / state.player.max_hp) * 100}%`;
-        playerMpText.textContent = `MP: ${state.player.mp} / ${state.player.max_mp}`;
-        playerMpBar.style.width = `${(state.player.mp / state.player.max_mp) * 100}%`;
+    // --- FUNÇÕES DE EFEITOS VISUAIS ---
+    function showFloatingDamage(targetPanel, damage) {
+        const container = targetPanel.querySelector('.damage-popup-container');
+        const popup = document.createElement('div');
+        popup.className = 'damage-popup';
+        popup.textContent = damage;
+        container.appendChild(popup);
+        setTimeout(() => popup.remove(), 1500);
+    }
+    function triggerFlash(targetPanel) {
+        targetPanel.classList.add('damage-flash');
+        setTimeout(() => targetPanel.classList.remove('damage-flash'), 300);
+    }
+    function triggerScreenShake() {
+        appContainer.classList.add('screen-shake');
+        setTimeout(() => appContainer.classList.remove('screen-shake'), 400);
+    }
 
-        // Monstro
+    // --- LÓGICA DE BATALHA ---
+    function updateBattleUI(state) {
+        playerBattleName.textContent = state.player.name;
+        playerHpBar.style.width = `${(state.player.hp / state.player.max_hp) * 100}%`;
+        playerHpText.textContent = `HP: ${state.player.hp} / ${state.player.max_hp}`;
+        playerMpBar.style.width = `${(state.player.mp / state.player.max_mp) * 100}%`;
+        playerMpText.textContent = `MP: ${state.player.mp} / ${state.player.max_mp}`;
+        
         monsterBattleName.textContent = state.monster.name;
         monsterAsciiArt.textContent = state.monster.ascii_art;
-        // A HP do monstro não tem max_hp no estado, então calculamos a porcentagem de forma diferente se necessário
-        // Por simplicidade, assumimos que a HP inicial é a máxima.
-        monsterHpText.textContent = `HP: ${state.monster.hp}`;
-        monsterHpBar.style.width = `${(state.monster.hp / 30) * 100}%`; // Assumindo 30 como HP máximo do goblin
+        currentMonsterMaxHp = state.monster.max_hp;
+        monsterHpBar.style.width = `${(state.monster.hp / currentMonsterMaxHp) * 100}%`;
+        monsterHpText.textContent = `HP: ${state.monster.hp} / ${currentMonsterMaxHp}`;
+        
+        turnIndicator.textContent = state.turn === 'player' ? 'Seu Turno' : 'Turno do Inimigo';
 
-        // Log
-        battleLog.innerHTML = '';
-        state.log.forEach(message => {
+        const newMessages = state.log.slice(lastLogLength);
+        newMessages.forEach(message => {
             const p = document.createElement('p');
             p.textContent = message;
             battleLog.appendChild(p);
+            const damageMatch = message.match(/causando (\d+) de dano/);
+            if (damageMatch) {
+                const damage = damageMatch[1];
+                if (message.includes('Você ataca') || message.includes('Você usa')) {
+                    showFloatingDamage(monsterPanel, damage);
+                    triggerFlash(monsterPanel);
+                } else {
+                    showFloatingDamage(playerPanel, damage);
+                    triggerFlash(playerPanel);
+                    triggerScreenShake();
+                }
+            }
         });
+        lastLogLength = state.log.length;
         battleLog.scrollTop = battleLog.scrollHeight;
 
-        // Fim da Batalha
         if (state.is_over) {
             battleControls.classList.add('hidden');
+            turnIndicator.classList.add('hidden');
             battleOverSection.classList.remove('hidden');
             battleResultText.textContent = state.winner === 'player' ? 'Vitória!' : 'Derrota...';
         } else {
-            // Habilita/desabilita botões baseado no turno
             attackBtn.disabled = state.turn !== 'player';
             skillBtn.disabled = state.turn !== 'player';
         }
     }
 
-    // Inicia uma nova batalha
     async function startBattle() {
         if (!playerId) return;
         const response = await fetch('/api/battle/start', {
@@ -149,14 +171,16 @@ document.addEventListener('DOMContentLoaded', () => {
             body: JSON.stringify({ player_id: playerId })
         });
         const gameState = await response.json();
+        skillInfo = gameState.player.skill;
+        lastLogLength = 0;
+        battleLog.innerHTML = '';
         updateBattleUI(gameState);
     }
 
-    // Lida com uma ação do jogador (ataque ou habilidade)
     async function handlePlayerAction(actionType) {
         attackBtn.disabled = true;
         skillBtn.disabled = true;
-
+        turnIndicator.textContent = 'Processando...';
         const response = await fetch('/api/battle/action', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -166,16 +190,29 @@ document.addEventListener('DOMContentLoaded', () => {
         updateBattleUI(gameState);
     }
     
-    // --- Inicialização e Event Listeners ---
-    if (creationSection) {
-        fetchAndRenderClasses();
-        createButton.addEventListener('click', handleCreateCharacter);
+    function transitionToBattle() {
+        creationSection.classList.add('hidden');
+        battleSection.classList.remove('hidden');
+        battleControls.classList.remove('hidden');
+        battleOverSection.classList.add('hidden');
+        turnIndicator.classList.remove('hidden');
+        startBattle();
     }
+
+    // --- Inicialização e Event Listeners ---
+    fetchAndRenderClasses();
+    createButton.addEventListener('click', handleCreateCharacter);
     attackBtn.addEventListener('click', () => handlePlayerAction('attack'));
     skillBtn.addEventListener('click', () => handlePlayerAction('special_skill'));
-    // O botão 'Continuar' pode reiniciar a batalha ou ir para a próxima tela
-    continueBtn.addEventListener('click', () => {
-        // Por enquanto, apenas recarrega a página para criar um novo personagem
-        window.location.reload(); 
+    continueBtn.addEventListener('click', () => window.location.reload());
+
+    skillBtn.addEventListener('mouseenter', () => {
+        if (skillInfo.name) {
+            skillTooltip.innerHTML = `<strong class="text-yellow-400">${skillInfo.name}</strong><p class="text-gray-300">${skillInfo.description}</p><p class="text-blue-400 mt-1">Custo: ${skillInfo.cost} MP</p>`;
+            skillTooltip.classList.remove('hidden');
+        }
+    });
+    skillBtn.addEventListener('mouseleave', () => {
+        skillTooltip.classList.add('hidden');
     });
 });
